@@ -7,6 +7,9 @@ const anthropic = new Anthropic({
 
 export default async function handler(req, res) {
   // Enable CORS
+  console.log('=== API ROUTE HIT ===');
+  console.log('Method:', req.method);
+  console.log('Headers:', req.headers);
   res.setHeader('Access-Control-Allow-Credentials', true);
   res.setHeader('Access-Control-Allow-Origin', '*');
   res.setHeader('Access-Control-Allow-Methods', 'GET,OPTIONS,PATCH,DELETE,POST,PUT');
