@@ -26,12 +26,13 @@ const App = () => {
       console.log('Sending request to:', API_URL); // Debug log
       
       const response = await fetch(API_URL, {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({ text }),
-      });
+  method: 'POST',
+  mode: 'cors',  // Tilføj denne linje
+  headers: {
+    'Content-Type': 'application/json',
+  },
+  body: JSON.stringify({ text }),
+});
 
       console.log('Response status:', response.status); // Debug log
       const responseText = await response.text();
