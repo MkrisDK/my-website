@@ -2,7 +2,7 @@
 import React, { useState } from 'react';
 
 const MAX_WORDS = 2500;
-const API_URL = 'https://ai-checker-nine.vercel.app/api/analyze'; // Opdater med dit domæne
+const API_URL = 'const API_URL = 'https://ai-checker-nine.vercel.app/api/analyze';'; // Opdater med dit domæne
 
 const App = () => {
   const [text, setText] = useState('');
