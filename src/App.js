@@ -7,14 +7,41 @@ const App = () => {
   const [language, setLanguage] = useState('English');
 
   const detectLanguage = (text) => {
-    // Simple language detection based on common words
-    const danishWords = /\b(og|eller|jeg|det|at|en|den|til|er|som|på|de|med|han|af|for|ikke|der|var|kan|ville|skulle|havde|har|jeg|du|vi)\b/gi;
-    const englishWords = /\b(the|be|to|of|and|a|in|that|have|i|it|for|not|on|with|he|as|you|do|at|this|but|his|by|from|they|we|say|her|she|or|an|will|my|one|all|would|there|their)\b/gi;
+    // Enhanced Danish language detection
+    const danishPatterns = {
+      commonWords: /\b(og|eller|jeg|det|at|en|den|til|er|som|på|de|med|han|af|for|ikke|der|var|kan|ville|skulle|havde|har|jeg|du|vi|hvor|hvad|hvordan|hvorfor|samt|mens|efter|før|under|over)\b/gi,
+      specialChars: /[æøåÆØÅ]/g,
+      danishEndings: /\b\w+(et|en|ene|erne|ere|este|ede|ende|hed|dom|skab)\b/gi,
+      pronouns: /\b(jeg|du|han|hun|den|det|vi|i|de|mig|dig|sig|ham|hende|os|jer|dem|min|din|sin|hans|hendes|vores|jeres|deres)\b/gi
+    };
     
-    const danishCount = (text.match(danishWords) || []).length;
-    const englishCount = (text.match(englishWords) || []).length;
+    const englishPatterns = {
+      commonWords: /\b(the|be|to|of|and|a|in|that|have|i|it|for|not|on|with|he|as|you|do|at|this|but|his|by|from|they|we|say|her|she|or|an|will|my|one|all|would|there|their)\b/gi,
+      specialChars: /['"]/g,
+      englishEndings: /\b\w+(ing|ed|ly|tion|sion|ment|ness|ful|less|able|ible)\b/gi,
+      pronouns: /\b(I|you|he|she|it|we|they|me|him|her|us|them|my|your|his|her|its|our|their)\b/g
+    };
+
+    // Calculate weighted scores for each language
+    const scores = {
+      danish: {
+        commonWords: (text.match(danishPatterns.commonWords) || []).length * 2,
+        specialChars: (text.match(danishPatterns.specialChars) || []).length * 3,
+        endings: (text.match(danishPatterns.danishEndings) || []).length * 2,
+        pronouns: (text.match(danishPatterns.pronouns) || []).length
+      },
+      english: {
+        commonWords: (text.match(englishPatterns.commonWords) || []).length * 2,
+        specialChars: (text.match(englishPatterns.specialChars) || []).length,
+        endings: (text.match(englishPatterns.englishEndings) || []).length * 2,
+        pronouns: (text.match(englishPatterns.pronouns) || []).length
+      }
+    };
+
+    const danishScore = Object.values(scores.danish).reduce((a, b) => a + b, 0);
+    const englishScore = Object.values(scores.english).reduce((a, b) => a + b, 0);
     
-    return danishCount > englishCount ? 'Danish' : 'English';
+    return danishScore > englishScore ? 'Danish' : 'English';
   };
 
   const analyzeText = (text) => {
@@ -40,10 +67,12 @@ const App = () => {
     // 3. Language-specific patterns
     const patterns = detectedLanguage === 'Danish' 
       ? {
-          contractions: /\b(kan't|vil't|må't|skal't)\b/g,
-          informalWords: /\b(altså|bare|lige|jo|vel|nok|sådan|faktisk)\b/gi,
-          personalPronouns: /\b(jeg|du|han|hun|vi|i|de|mig|dig|os)\b/gi,
-          transitionWords: /\b(derfor|således|dermed|hvorfor|eftersom|fordi|desuden)\b/gi
+          // Enhanced Danish patterns
+          contractions: /\b(ku'|ka'|sku'|ha'|vil'|bli'|gi')\b/g,
+          informalWords: /\b(altså|bare|lige|jo|vel|nok|sådan|faktisk|sgu|sås|øh|åh|hmm|øhm|nemlig|simpelthen|okay|super|mega|vildt|helt|totalt|virkelig|bare|kun|ret)\b/gi,
+          personalPronouns: /\b(jeg|du|han|hun|vi|i|de|mig|dig|os|jer|dem|min|din|hans|hendes|vores|jeres|deres|sig)\b/gi,
+          transitionWords: /\b(derfor|således|dermed|hvorfor|eftersom|fordi|desuden|derudover|endvidere|ydermere|hertil|hvorved|hvorefter|dernæst|endelig|følgelig|heraf|derved|hermed|derimod|trods|skønt)\b/gi,
+          businessTerms: /\b(virksomhed|firma|kunde|produkt|marked|salg|pris|aftale|kontrakt|møde|projekt|udvikling|strategi|mål|resultat|analyse|rapport|budget|regnskab|investering|omkostning)\b/gi
         }
       : {
           contractions: /\'[a-z]{1,2}\b/g,
