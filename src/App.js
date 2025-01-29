@@ -1,5 +1,5 @@
 import React from 'react';
-import { Menu, X, ArrowRight, GitHub, Twitter, Linkedin } from 'lucide-react';
+import { Menu, X, ArrowRight, Github, Twitter, Linkedin } from 'lucide-react';
 
 const Navigation = () => {
   const [isOpen, setIsOpen] = React.useState(false);
@@ -89,7 +89,7 @@ const About = () => (
           </p>
           <div className="flex space-x-4">
             <a href="#" className="text-gray-600 hover:text-black">
-              <GitHub size={24} />
+              <Github size={24} />
             </a>
             <a href="#" className="text-gray-600 hover:text-black">
               <Twitter size={24} />
@@ -226,7 +226,7 @@ const Footer = () => (
           <h3 className="text-xl font-bold mb-4">Connect</h3>
           <div className="flex space-x-4">
             <a href="#" className="text-gray-400 hover:text-white">
-              <GitHub size={24} />
+              <Github size={24} />
             </a>
             <a href="#" className="text-gray-400 hover:text-white">
               <Twitter size={24} />
