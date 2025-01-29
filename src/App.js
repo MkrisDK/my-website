@@ -1,260 +1,132 @@
-import React from 'react';
-import { Menu, X, ArrowRight, Github, Twitter, Linkedin } from 'lucide-react';
+import React, { useState } from 'react';
 
-const Navigation = () => {
-  const [isOpen, setIsOpen] = React.useState(false);
+const App = () => {
+  const [text, setText] = useState('');
+  const [result, setResult] = useState(null);
 
-  return (
-    <nav className="fixed top-0 left-0 right-0 bg-white/80 backdrop-blur-md z-50">
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div className="flex items-center justify-between h-16">
-          <div className="flex-shrink-0">
-            <span className="text-2xl font-bold">YourName</span>
-          </div>
-          
-          {/* Desktop Navigation */}
-          <div className="hidden md:block">
-            <div className="ml-10 flex items-center space-x-4">
-              <a href="#home" className="px-3 py-2 text-gray-700 hover:text-black">Home</a>
-              <a href="#about" className="px-3 py-2 text-gray-700 hover:text-black">About</a>
-              <a href="#projects" className="px-3 py-2 text-gray-700 hover:text-black">Projects</a>
-              <a href="#contact" className="px-3 py-2 text-gray-700 hover:text-black">Contact</a>
-            </div>
-          </div>
-
-          {/* Mobile Navigation Button */}
-          <div className="md:hidden">
-            <button onClick={() => setIsOpen(!isOpen)} className="p-2">
-              {isOpen ? <X size={24} /> : <Menu size={24} />}
-            </button>
-          </div>
-        </div>
-      </div>
-
-      {/* Mobile Navigation Menu */}
-      {isOpen && (
-        <div className="md:hidden">
-          <div className="px-2 pt-2 pb-3 space-y-1 sm:px-3">
-            <a href="#home" className="block px-3 py-2 text-gray-700">Home</a>
-            <a href="#about" className="block px-3 py-2 text-gray-700">About</a>
-            <a href="#projects" className="block px-3 py-2 text-gray-700">Projects</a>
-            <a href="#contact" className="block px-3 py-2 text-gray-700">Contact</a>
-          </div>
-        </div>
-      )}
-    </nav>
-  );
-};
-
-const Hero = () => (
-  <section id="home" className="pt-20 pb-10 lg:pt-32 lg:pb-20">
-    <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-      <div className="text-center">
-        <h1 className="text-4xl font-bold sm:text-6xl">
-          Welcome to My Website
-        </h1>
-        <p className="mt-6 text-xl text-gray-600">
-          I create amazing digital experiences
-        </p>
-        <div className="mt-10">
-          <a href="#contact" className="inline-flex items-center px-6 py-3 border border-transparent text-base font-medium rounded-md text-white bg-blue-600 hover:bg-blue-700">
-            Get in Touch <ArrowRight className="ml-2" size={20} />
-          </a>
-        </div>
-      </div>
-    </div>
-  </section>
-);
-
-const About = () => (
-  <section id="about" className="py-20 bg-gray-50">
-    <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-      <h2 className="text-3xl font-bold text-center mb-12">About Me</h2>
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-12 items-center">
-        <div>
-          <img 
-            src="/api/placeholder/400/400"
-            alt="Profile" 
-            className="rounded-lg shadow-lg"
-          />
-        </div>
-        <div>
-          <p className="text-lg text-gray-600 mb-6">
-            I'm a passionate developer/designer with experience in creating modern web applications.
-            My focus is on building intuitive and engaging user experiences.
-          </p>
-          <p className="text-lg text-gray-600 mb-6">
-            With expertise in React, Node.js, and modern web technologies, I bring ideas to life
-            through clean code and beautiful design.
-          </p>
-          <div className="flex space-x-4">
-            <a href="#" className="text-gray-600 hover:text-black">
-              <Github size={24} />
-            </a>
-            <a href="#" className="text-gray-600 hover:text-black">
-              <Twitter size={24} />
-            </a>
-            <a href="#" className="text-gray-600 hover:text-black">
-              <Linkedin size={24} />
-            </a>
-          </div>
-        </div>
-      </div>
-    </div>
-  </section>
-);
-
-const Projects = () => (
-  <section id="projects" className="py-20">
-    <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-      <h2 className="text-3xl font-bold text-center mb-12">My Projects</h2>
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-        {[1, 2, 3].map((project) => (
-          <div key={project} className="bg-white rounded-lg shadow-lg overflow-hidden">
-            <img 
-              src={`/api/placeholder/400/300`}
-              alt={`Project ${project}`}
-              className="w-full h-48 object-cover"
-            />
-            <div className="p-6">
-              <h3 className="text-xl font-semibold mb-2">Project Title {project}</h3>
-              <p className="text-gray-600 mb-4">
-                A brief description of this amazing project and its key features.
-              </p>
-              <a href="#" className="text-blue-600 hover:text-blue-700 font-medium">
-                Learn More <ArrowRight className="inline ml-1" size={16} />
-              </a>
-            </div>
-          </div>
-        ))}
-      </div>
-    </div>
-  </section>
-);
-
-const Contact = () => {
-  const [formData, setFormData] = React.useState({
-    name: '',
-    email: '',
-    message: ''
-  });
+  const analyzeText = (text) => {
+    // AI Detection Metrics
+    const words = text.toLowerCase().split(/\s+/);
+    const sentences = text.split(/[.!?]+/).filter(Boolean);
+    
+    // Calculate various indicators
+    const uniqueWords = new Set(words);
+    const repetitionScore = (uniqueWords.size / words.length) * 100;
+    
+    const contractions = (text.match(/\'[a-z]{1,2}\b/g) || []).length;
+    const pronouns = (text.match(/\b(I|me|my|mine|we|us|our|ours)\b/gi) || []).length;
+    const naturalScore = ((contractions + pronouns) / words.length) * 100;
+    
+    const avgLength = words.length / sentences.length;
+    const complexityScore = avgLength > 10 && avgLength < 25 ? 100 : 50;
+    
+    // Calculate final score
+    const score = (repetitionScore * 0.4 + naturalScore * 0.3 + complexityScore * 0.3);
+    
+    return {
+      score: Math.min(Math.round(score), 100),
+      details: {
+        repetition: Math.round(repetitionScore),
+        naturalness: Math.round(naturalScore),
+        complexity: Math.round(complexityScore)
+      }
+    };
+  };
 
   const handleSubmit = (e) => {
     e.preventDefault();
-    // Handle form submission here
-    console.log('Form submitted:', formData);
+    if (text.length < 50) {
+      setResult({ error: "Please enter at least 50 characters for a more accurate analysis" });
+      return;
+    }
+    const analysis = analyzeText(text);
+    setResult(analysis);
   };
 
   return (
-    <section id="contact" className="py-20 bg-gray-50">
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <h2 className="text-3xl font-bold text-center mb-12">Get in Touch</h2>
-        <div className="max-w-xl mx-auto">
+    <div className="min-h-screen bg-gray-50">
+      {/* Header */}
+      <header className="bg-white shadow-sm">
+        <div className="max-w-7xl mx-auto px-4 py-4 sm:px-6 lg:px-8">
+          <h1 className="text-2xl font-bold text-gray-900">AI Text Detector</h1>
+        </div>
+      </header>
+
+      {/* Main Content */}
+      <main className="max-w-3xl mx-auto px-4 py-8 sm:px-6 lg:px-8">
+        <div className="bg-white shadow rounded-lg p-6">
           <form onSubmit={handleSubmit} className="space-y-6">
             <div>
-              <label htmlFor="name" className="block text-sm font-medium text-gray-700">
-                Name
-              </label>
-              <input
-                type="text"
-                id="name"
-                value={formData.name}
-                onChange={(e) => setFormData({...formData, name: e.target.value})}
-                className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500"
-                required
-              />
-            </div>
-            <div>
-              <label htmlFor="email" className="block text-sm font-medium text-gray-700">
-                Email
-              </label>
-              <input
-                type="email"
-                id="email"
-                value={formData.email}
-                onChange={(e) => setFormData({...formData, email: e.target.value})}
-                className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500"
-                required
-              />
-            </div>
-            <div>
-              <label htmlFor="message" className="block text-sm font-medium text-gray-700">
-                Message
+              <label htmlFor="text-input" className="block text-sm font-medium text-gray-700 mb-2">
+                Paste your text here
               </label>
               <textarea
-                id="message"
-                rows={4}
-                value={formData.message}
-                onChange={(e) => setFormData({...formData, message: e.target.value})}
-                className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500"
-                required
+                id="text-input"
+                rows={8}
+                className="w-full rounded-lg border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500"
+                placeholder="Enter at least 50 characters..."
+                value={text}
+                onChange={(e) => setText(e.target.value)}
               />
             </div>
             <button
               type="submit"
-              className="w-full flex justify-center py-3 px-4 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500"
+              className="w-full bg-blue-600 text-white py-3 px-4 rounded-md hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500"
             >
-              Send Message
+              Analyze Text
             </button>
           </form>
-        </div>
-      </div>
-    </section>
-  );
-};
 
-const Footer = () => (
-  <footer className="bg-gray-800 text-white py-12">
-    <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
-        <div>
-          <h3 className="text-xl font-bold mb-4">YourName</h3>
-          <p className="text-gray-400">
-            Creating amazing digital experiences
-          </p>
-        </div>
-        <div>
-          <h3 className="text-xl font-bold mb-4">Quick Links</h3>
-          <ul className="space-y-2">
-            <li><a href="#home" className="text-gray-400 hover:text-white">Home</a></li>
-            <li><a href="#about" className="text-gray-400 hover:text-white">About</a></li>
-            <li><a href="#projects" className="text-gray-400 hover:text-white">Projects</a></li>
-            <li><a href="#contact" className="text-gray-400 hover:text-white">Contact</a></li>
-          </ul>
-        </div>
-        <div>
-          <h3 className="text-xl font-bold mb-4">Connect</h3>
-          <div className="flex space-x-4">
-            <a href="#" className="text-gray-400 hover:text-white">
-              <Github size={24} />
-            </a>
-            <a href="#" className="text-gray-400 hover:text-white">
-              <Twitter size={24} />
-            </a>
-            <a href="#" className="text-gray-400 hover:text-white">
-              <Linkedin size={24} />
-            </a>
-          </div>
-        </div>
-      </div>
-      <div className="mt-8 pt-8 border-t border-gray-700 text-center text-gray-400">
-        <p>&copy; {new Date().getFullYear()} YourName. All rights reserved.</p>
-      </div>
-    </div>
-  </footer>
-);
+          {/* Results Section */}
+          {result && !result.error && (
+            <div className="mt-8 space-y-6">
+              <div className="border-b pb-4">
+                <div className="flex items-center justify-between">
+                  <h2 className="text-xl font-semibold">AI Probability Score</h2>
+                  <span className="text-3xl font-bold text-blue-600">{result.score}%</span>
+                </div>
+                <p className="mt-2 text-sm text-gray-600">
+                  {result.score > 70 
+                    ? "This text shows strong indicators of AI generation."
+                    : result.score > 40
+                    ? "This text shows mixed indicators of human and AI writing."
+                    : "This text shows strong indicators of human writing."}
+                </p>
+              </div>
 
-const App = () => {
-  return (
-    <div className="min-h-screen bg-white">
-      <Navigation />
-      <main>
-        <Hero />
-        <About />
-        <Projects />
-        <Contact />
+              <div className="space-y-4">
+                <h3 className="text-lg font-medium">Analysis Breakdown</h3>
+                <div className="grid gap-4">
+                  <div className="bg-gray-50 p-4 rounded-lg">
+                    <div className="flex justify-between items-center">
+                      <span className="font-medium">Word Repetition</span>
+                      <span>{result.details.repetition}%</span>
+                    </div>
+                  </div>
+                  <div className="bg-gray-50 p-4 rounded-lg">
+                    <div className="flex justify-between items-center">
+                      <span className="font-medium">Natural Language</span>
+                      <span>{result.details.naturalness}%</span>
+                    </div>
+                  </div>
+                  <div className="bg-gray-50 p-4 rounded-lg">
+                    <div className="flex justify-between items-center">
+                      <span className="font-medium">Text Complexity</span>
+                      <span>{result.details.complexity}%</span>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          )}
+
+          {result?.error && (
+            <div className="mt-4 p-4 bg-red-50 text-red-700 rounded-lg">
+              {result.error}
+            </div>
+          )}
+        </div>
       </main>
-      <Footer />
     </div>
   );
 };
