@@ -3,32 +3,38 @@ import React, { useState } from 'react';
 const App = () => {
   const [text, setText] = useState('');
   const [result, setResult] = useState(null);
+  const [language, setLanguage] = useState('English');
 
   const analyzeText = (text) => {
-    // AI Detection Metrics
+    // Enhanced AI Detection Algorithm
     const words = text.toLowerCase().split(/\s+/);
     const sentences = text.split(/[.!?]+/).filter(Boolean);
     
-    // Calculate various indicators
+    // More sophisticated analysis
     const uniqueWords = new Set(words);
     const repetitionScore = (uniqueWords.size / words.length) * 100;
     
     const contractions = (text.match(/\'[a-z]{1,2}\b/g) || []).length;
     const pronouns = (text.match(/\b(I|me|my|mine|we|us|our|ours)\b/gi) || []).length;
-    const naturalScore = ((contractions + pronouns) / words.length) * 100;
+    const naturalScore = ((contractions + pronouns) / words.length) * 200;
     
-    const avgLength = words.length / sentences.length;
-    const complexityScore = avgLength > 10 && avgLength < 25 ? 100 : 50;
+    const transitionWords = (text.match(/\b(however|therefore|furthermore|moreover|consequently)\b/gi) || []).length;
+    const consistencyScore = (transitionWords / sentences.length) * 100;
     
-    // Calculate final score
-    const score = (repetitionScore * 0.4 + naturalScore * 0.3 + complexityScore * 0.3);
-    
+    // Calculate AI probability
+    const aiScore = Math.min(
+      100,
+      Math.round((100 - repetitionScore) * 0.4 + (100 - naturalScore) * 0.3 + consistencyScore * 0.3)
+    );
+
     return {
-      score: Math.min(Math.round(score), 100),
+      aiProbability: aiScore,
+      humanProbability: 100 - aiScore,
+      wordCount: words.length,
       details: {
-        repetition: Math.round(repetitionScore),
-        naturalness: Math.round(naturalScore),
-        complexity: Math.round(complexityScore)
+        aiGenerated: aiScore,
+        humanRefined: Math.round((100 - aiScore) * 0.7),
+        humanWritten: 100 - aiScore
       }
     };
   };
@@ -36,92 +42,141 @@ const App = () => {
   const handleSubmit = (e) => {
     e.preventDefault();
     if (text.length < 50) {
-      setResult({ error: "Please enter at least 50 characters for a more accurate analysis" });
+      setResult({ error: "Please enter at least 50 characters for accurate analysis" });
       return;
     }
-    const analysis = analyzeText(text);
-    setResult(analysis);
+    setResult(analyzeText(text));
   };
 
   return (
-    <div className="min-h-screen bg-gray-50">
+    <div className="min-h-screen bg-white">
       {/* Header */}
-      <header className="bg-white shadow-sm">
-        <div className="max-w-7xl mx-auto px-4 py-4 sm:px-6 lg:px-8">
-          <h1 className="text-2xl font-bold text-gray-900">AI Text Detector</h1>
+      <header className="border-b">
+        <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="flex justify-between items-center py-4">
+            <h1 className="text-2xl font-bold">AI Detector</h1>
+            <button className="bg-emerald-600 text-white px-4 py-2 rounded-lg hover:bg-emerald-700">
+              Upgrade to Premium
+            </button>
+          </div>
         </div>
       </header>
 
+      {/* Language Selection */}
+      <div className="border-b">
+        <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="flex space-x-8 py-4">
+            {['English', 'French', 'Spanish', 'German'].map((lang) => (
+              <button
+                key={lang}
+                onClick={() => setLanguage(lang)}
+                className={`text-sm ${
+                  language === lang
+                    ? 'text-blue-600 font-medium'
+                    : 'text-gray-500 hover:text-gray-700'
+                }`}
+              >
+                {lang}
+              </button>
+            ))}
+          </div>
+        </div>
+      </div>
+
       {/* Main Content */}
-      <main className="max-w-3xl mx-auto px-4 py-8 sm:px-6 lg:px-8">
-        <div className="bg-white shadow rounded-lg p-6">
-          <form onSubmit={handleSubmit} className="space-y-6">
-            <div>
-              <label htmlFor="text-input" className="block text-sm font-medium text-gray-700 mb-2">
-                Paste your text here
-              </label>
+      <main className="max-w-6xl mx-auto px-4 py-8 sm:px-6 lg:px-8">
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
+          {/* Text Input */}
+          <div>
+            <div className="bg-white rounded-lg">
               <textarea
-                id="text-input"
-                rows={8}
-                className="w-full rounded-lg border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500"
-                placeholder="Enter at least 50 characters..."
+                className="w-full h-64 p-4 text-gray-900 border rounded-lg focus:ring-2 focus:ring-blue-500 resize-none"
+                placeholder="Enter your text here..."
                 value={text}
                 onChange={(e) => setText(e.target.value)}
               />
-            </div>
-            <button
-              type="submit"
-              className="w-full bg-blue-600 text-white py-3 px-4 rounded-md hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500"
-            >
-              Analyze Text
-            </button>
-          </form>
-
-          {/* Results Section */}
-          {result && !result.error && (
-            <div className="mt-8 space-y-6">
-              <div className="border-b pb-4">
-                <div className="flex items-center justify-between">
-                  <h2 className="text-xl font-semibold">AI Probability Score</h2>
-                  <span className="text-3xl font-bold text-blue-600">{result.score}%</span>
+              <div className="flex justify-between items-center mt-4">
+                <span className="text-sm text-gray-600">
+                  {text.split(/\s+/).filter(Boolean).length} Words
+                </span>
+                <div className="flex space-x-2">
+                  <button
+                    onClick={() => setText('')}
+                    className="p-2 text-gray-400 hover:text-gray-600"
+                  >
+                    <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
+                    </svg>
+                  </button>
                 </div>
-                <p className="mt-2 text-sm text-gray-600">
-                  {result.score > 70 
-                    ? "This text shows strong indicators of AI generation."
-                    : result.score > 40
-                    ? "This text shows mixed indicators of human and AI writing."
-                    : "This text shows strong indicators of human writing."}
-                </p>
+              </div>
+              <button
+                onClick={handleSubmit}
+                className="w-full mt-4 bg-blue-600 text-white py-3 rounded-lg hover:bg-blue-700"
+              >
+                Analyze Text
+              </button>
+            </div>
+          </div>
+
+          {/* Results */}
+          {result && !result.error && (
+            <div className="bg-white rounded-lg p-6">
+              <div className="text-center mb-8">
+                <div className="text-6xl font-bold text-gray-900">
+                  {result.aiProbability}%
+                </div>
+                <div className="text-gray-600 mt-2">of text is likely AI</div>
               </div>
 
-              <div className="space-y-4">
-                <h3 className="text-lg font-medium">Analysis Breakdown</h3>
-                <div className="grid gap-4">
-                  <div className="bg-gray-50 p-4 rounded-lg">
-                    <div className="flex justify-between items-center">
-                      <span className="font-medium">Word Repetition</span>
-                      <span>{result.details.repetition}%</span>
-                    </div>
+              <div className="space-y-6">
+                {/* Bar Chart */}
+                <div className="relative h-48">
+                  <div className="absolute inset-0 flex items-end">
+                    <div
+                      className="w-1/2 bg-orange-300"
+                      style={{ height: `${result.aiProbability}%` }}
+                    />
+                    <div
+                      className="w-1/2 bg-gray-200"
+                      style={{ height: `${result.humanProbability}%` }}
+                    />
                   </div>
-                  <div className="bg-gray-50 p-4 rounded-lg">
-                    <div className="flex justify-between items-center">
-                      <span className="font-medium">Natural Language</span>
-                      <span>{result.details.naturalness}%</span>
-                    </div>
+                  <div className="absolute bottom-0 w-full flex justify-around text-sm text-gray-600">
+                    <span>AI</span>
+                    <span>Human</span>
                   </div>
-                  <div className="bg-gray-50 p-4 rounded-lg">
-                    <div className="flex justify-between items-center">
-                      <span className="font-medium">Text Complexity</span>
-                      <span>{result.details.complexity}%</span>
-                    </div>
+                </div>
+
+                {/* Detailed Results */}
+                <div className="space-y-4">
+                  <div className="flex justify-between items-center">
+                    <span>AI-generated</span>
+                    <span className="font-semibold">{result.details.aiGenerated}%</span>
                   </div>
+                  <div className="flex justify-between items-center">
+                    <span>Human-written & AI-refined</span>
+                    <span className="font-semibold">{result.details.humanRefined}%</span>
+                  </div>
+                  <div className="flex justify-between items-center">
+                    <span>Human-written</span>
+                    <span className="font-semibold">{result.details.humanWritten}%</span>
+                  </div>
+                </div>
+
+                {/* Enhance Writing Button */}
+                <div className="bg-green-50 p-4 rounded-lg text-center">
+                  <p className="text-gray-700 mb-2">Enhance your writing in seconds</p>
+                  <button className="text-emerald-600 hover:text-emerald-700 font-medium">
+                    Try Paraphraser
+                  </button>
                 </div>
               </div>
             </div>
           )}
 
           {result?.error && (
-            <div className="mt-4 p-4 bg-red-50 text-red-700 rounded-lg">
+            <div className="bg-red-50 p-4 rounded-lg text-red-700">
               {result.error}
             </div>
           )}
