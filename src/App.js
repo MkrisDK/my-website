@@ -7,11 +7,74 @@ const App = () => {
   const [language, setLanguage] = useState('English');
   const [isMenuOpen, setIsMenuOpen] = useState(false);
 
-  // AI detection function remains the same as before...
   const analyzeText = (text) => {
-    // Previous AI detection logic
+    // Enhanced AI Detection Algorithm
     const words = text.toLowerCase().split(/\s+/);
-    // ... (keeping the same detection logic)
+    const sentences = text.split(/[.!?]+/).filter(Boolean);
+    
+    // 1. Analyze word patterns and vocabulary sophistication
+    const uniqueWords = new Set(words);
+    const vocabularyRichness = (uniqueWords.size / words.length);
+    const repetitionScore = vocabularyRichness * 100;
+
+    // 2. Analyze sentence structure variation
+    const sentenceLengths = sentences.map(s => s.trim().split(/\s+/).length);
+    const avgLength = sentenceLengths.reduce((a, b) => a + b, 0) / sentences.length;
+    const lengthVariation = Math.sqrt(
+      sentenceLengths.reduce((acc, len) => acc + Math.pow(len - avgLength, 2), 0) / sentences.length
+    );
+    const structureScore = (lengthVariation / avgLength) * 100;
+
+    // 3. Check for natural language patterns
+    const contractions = (text.match(/\'[a-z]{1,2}\b/g) || []).length;
+    const informalWords = (text.match(/\b(well|just|really|actually|basically|like)\b/gi) || []).length;
+    const personalPronouns = (text.match(/\b(I|me|my|mine|we|us|our|ours)\b/gi) || []).length;
+    const naturalScore = ((contractions + informalWords + personalPronouns) / words.length) * 150;
+
+    // 4. Analyze structural coherence
+    const transitionWords = (text.match(/\b(however|therefore|furthermore|moreover|consequently|because|thus)\b/gi) || []).length;
+    const coherenceScore = (transitionWords / sentences.length) * 100;
+
+    // 5. Calculate perplexity (measure of predictability)
+    const wordFreq = {};
+    words.forEach(word => {
+      wordFreq[word] = (wordFreq[word] || 0) + 1;
+    });
+    const entropy = Object.values(wordFreq).reduce((acc, freq) => {
+      const p = freq / words.length;
+      return acc - (p * Math.log2(p));
+    }, 0);
+    const perplexityScore = Math.min(entropy * 15, 100);
+
+    // Weighted scoring system
+    const aiScore = Math.min(
+      100,
+      Math.round(
+        (100 - repetitionScore) * 0.25 +
+        (100 - naturalScore) * 0.25 +
+        coherenceScore * 0.2 +
+        structureScore * 0.15 +
+        perplexityScore * 0.15
+      )
+    );
+
+    return {
+      aiProbability: aiScore,
+      humanProbability: Math.max(0, 100 - aiScore),
+      wordCount: words.length,
+      details: {
+        aiGenerated: aiScore,
+        humanRefined: Math.round((100 - aiScore) * 0.7),
+        humanWritten: Math.max(0, 100 - aiScore)
+      },
+      metrics: {
+        vocabularyRichness: Math.round(repetitionScore),
+        naturalness: Math.round(naturalScore),
+        coherence: Math.round(coherenceScore),
+        structure: Math.round(structureScore),
+        perplexity: Math.round(perplexityScore)
+      }
+    };
   };
 
   const handleSubmit = (e) => {
@@ -20,7 +83,8 @@ const App = () => {
       setResult({ error: "Please enter at least 50 characters for accurate analysis" });
       return;
     }
-    setResult(analyzeText(text));
+    const analysis = analyzeText(text);
+    setResult(analysis);
   };
 
   return (
@@ -108,6 +172,21 @@ const App = () => {
                       <div className="flex justify-between items-center">
                         <span className="text-gray-600">Human-written</span>
                         <span className="font-medium">{result.details.humanWritten}%</span>
+                      </div>
+                    </div>
+
+                    {/* Detailed Metrics */}
+                    <div className="mt-8">
+                      <h3 className="text-sm font-medium text-gray-900 mb-4">Analysis Metrics</h3>
+                      <div className="space-y-3">
+                        {Object.entries(result.metrics).map(([key, value]) => (
+                          <div key={key} className="flex justify-between items-center">
+                            <span className="text-sm text-gray-600 capitalize">
+                              {key.replace(/([A-Z])/g, ' $1').trim()}
+                            </span>
+                            <span className="text-sm font-medium">{value}%</span>
+                          </div>
+                        ))}
                       </div>
                     </div>
                   </div>
