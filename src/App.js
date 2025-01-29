@@ -1,8 +1,7 @@
-// App.js
 import React, { useState } from 'react';
 
 const MAX_WORDS = 2500;
-const API_URL = 'const API_URL = 'https://ai-checker-nine.vercel.app/api/analyze';'; // Opdater med dit domæne
+const API_URL = 'https://ai-checker-nine.vercel.app/api/analyze';
 
 const App = () => {
   const [text, setText] = useState('');
@@ -35,17 +34,24 @@ const App = () => {
       });
 
       console.log('Response status:', response.status); // Debug log
+      const responseText = await response.text();
+      console.log('Raw response:', responseText); // Debug log
 
-      if (!response.ok) {
-        const error = await response.json();
-        throw new Error(error.error || 'Analysis failed');
+      let data;
+      try {
+        data = JSON.parse(responseText);
+      } catch (e) {
+        console.error('JSON parse error:', e);
+        throw new Error('Invalid response format');
       }
 
-      const analysis = await response.json();
-      console.log('Analysis result:', analysis); // Debug log
-      setResult(analysis);
+      if (data.error) {
+        throw new Error(data.error);
+      }
+
+      setResult(data);
     } catch (error) {
-      console.error('Error during analysis:', error); // Debug log
+      console.error('Error during analysis:', error);
       setResult({ error: error.message });
     } finally {
       setIsAnalyzing(false);
