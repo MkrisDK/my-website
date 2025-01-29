@@ -1,7 +1,6 @@
 import React, { useState } from 'react';
 
 const MAX_WORDS = 2500;
-const API_URL = 'https://ai-checker-nine.vercel.app/api/analyze';
 
 const App = () => {
   const [text, setText] = useState('');
@@ -23,16 +22,15 @@ const App = () => {
 
     try {
       setIsAnalyzing(true);
-      console.log('Sending request to:', API_URL); // Debug log
+      console.log('Starting analysis...'); // Debug log
       
-      const response = await fetch(API_URL, {
-  method: 'POST',
-  mode: 'cors',  // Tilføj denne linje
-  headers: {
-    'Content-Type': 'application/json',
-  },
-  body: JSON.stringify({ text }),
-});
+      const response = await fetch('/api/analyze', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ text }),
+      });
 
       console.log('Response status:', response.status); // Debug log
       const responseText = await response.text();
